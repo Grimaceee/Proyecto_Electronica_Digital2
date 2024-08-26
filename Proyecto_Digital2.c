@@ -132,3 +132,55 @@ void setup() {
   Serial.println();
   Serial.println(io.statusText());
 }
+
+
+void loop() {
+  
+  if (digitalRead(button_pin) == LOW) {
+    float lectura_analogica = analogRead(lm35_pin);
+    float voltaje = lectura_analogica * (3.3 / 4095.0);
+    float temperatura = voltaje * 100.0 + 17; 
+    io.run();
+    Serial.print("Lectura ADC: ");
+    Serial.print(lectura_analogica);
+    Serial.print(" | Voltaje: ");
+    Serial.print(voltaje);
+    Serial.print(" V | Temperatura: ");
+    Serial.print(temperatura);
+    Serial.println(" °C");
+    
+
+
+    // LEDs y Servo
+    if (temperatura > 37.5) {
+      ledcWrite(pwm_channel_rojo, 255);  // LED rojo encendido al máximo brillo
+      ledcWrite(pwm_channel_amarillo, 0); // LED amarillo apagado
+      ledcWrite(pwm_channel_verde, 0);    // LED verde apagado
+      mi_servo.write(0);    
+      verde ->save(0); 
+      rojo ->save(1);
+      amarillo ->save(0);           // Posición del servo en 180 grados
+    } else if (temperatura > 37.0 && temperatura <= 37.5) {
+      ledcWrite(pwm_channel_rojo, 0);     // LED rojo apagado
+      ledcWrite(pwm_channel_amarillo, 255); // LED amarillo encendido al máximo brillo
+      ledcWrite(pwm_channel_verde, 0);    // LED verde apagado
+      mi_servo.write(90); 
+      verde ->save(0); 
+      rojo ->save(0);
+      amarillo ->save(1);                    // Posición del servo en 90 grados
+    } else if(temperatura < 37) {
+      ledcWrite(pwm_channel_rojo, 0);     // LED rojo apagado
+      ledcWrite(pwm_channel_amarillo, 0); // LED amarillo apagado
+      ledcWrite(pwm_channel_verde, 255);  // LED verde encendido al máximo brillo
+      mi_servo.write(180);  
+      verde ->save(1); 
+      rojo ->save(0);
+      amarillo ->save(0);                     // Posición del servo en 0 grados
+    }
+    mostrarNumero(temperatura);
+    temperCanal ->save(temperatura);
+    delay(5); 
+
+  }
+  delay(5); 
+}
