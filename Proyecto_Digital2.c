@@ -80,3 +80,55 @@ void mostrarNumero(int numero) {
     delay(5); // Corto delay para mantener sincronía
     digitalWrite(digito3, LOW); // Apagar el display 3
 }
+void setup() {
+
+  // Configurar PWM
+  ledcSetup(pwm_channel_rojo, pwm_freq, pwm_resolution);
+  ledcAttachPin(pin_rojo, pwm_channel_rojo);
+
+  ledcSetup(pwm_channel_amarillo, pwm_freq, pwm_resolution);
+  ledcAttachPin(pin_amarillo, pwm_channel_amarillo);
+
+  ledcSetup(pwm_channel_verde, pwm_freq, pwm_resolution);
+  ledcAttachPin(pin_verde, pwm_channel_verde);
+
+  // pin del servo
+  mi_servo.attach(32);
+
+  // Configurar del boton
+  pinMode(button_pin, INPUT_PULLUP);
+
+  // Segmentos
+  pinMode(segA, OUTPUT);
+  pinMode(segB, OUTPUT);
+  pinMode(segC, OUTPUT);
+  pinMode(segD, OUTPUT);
+  pinMode(segE, OUTPUT);
+  pinMode(segF, OUTPUT);
+  pinMode(segG, OUTPUT);
+  pinMode(dp, OUTPUT);
+
+  // Digitos
+  pinMode(digito1, OUTPUT);
+  pinMode(digito2, OUTPUT);
+  pinMode(digito3, OUTPUT);
+
+  // Configurar la comunicación serial
+  Serial.begin(115200);
+
+  while(! Serial);
+
+  Serial.print("Connecting to Adafruit IO");
+
+  io.connect();
+
+  while(io.status() < AIO_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+
+
+   //we are connected
+  Serial.println();
+  Serial.println(io.statusText());
+}
