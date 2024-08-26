@@ -1,3 +1,10 @@
+//Universidad del Valle de Guatemala
+//Electronica Digital 2
+//Seccion 10
+//Ingeniero Pablo Mazariegos
+//Brandon Teneria, 22905, Estudiante de Ingenieria Biomedica
+
+
 #include <Arduino.h>
 #include <ESP32Servo.h>
 #include <config.h>
