@@ -2,7 +2,7 @@
 #include <ESP32Servo.h>
 #include <config.h>
 
-const int lm35_pin = 4;       // Pin de lectura del LM35
+const int lm35_pin = 4;       // Pin del LM35
 const int pin_rojo = 25;      // Pin para el LED rojo
 const int pin_amarillo = 26;  // Pin para el LED amarillo
 const int pin_verde = 27;     // Pin para el LED verde
@@ -28,6 +28,11 @@ const int digito3 = 13;
 
 Servo mi_servo;  // Objeto para controlar el servo
 
+//AdafruitIO_Feed *temperCanal = io.feed("temp");
+//AdafruitIO_Feed *verde = io.feed("servoverde");
+//AdafruitIO_Feed *amarillo = io.feed("amarillo");
+//AdafruitIO_Feed *rojo = io.feed("rojo");
+
 // segmentos para dígitos del 0-9
 byte segmentos[] = {
     0b00111111, // 0
@@ -42,7 +47,7 @@ byte segmentos[] = {
     0b01101111  // 9
 };
 
-// Función para mostrar un dígito en el display
+// Digitos en el display
 void mostrarDigito(byte valor, bool punto) {
     // Asignar cada segmento
     digitalWrite(segA, valor & 0b00000001);
@@ -63,23 +68,25 @@ void mostrarNumero(int numero) {
 
   // Mostrar decenas
     digitalWrite(digito1, HIGH); // Encender el display 1
-    mostrarDigito(segmentos[decenas], false); // Mostrar el dígito de la decena con punto decimal
-    delay(5); // Corto delay para mantener sincronía
-    digitalWrite(digito1, LOW); // Apagar el display 2
+    mostrarDigito(segmentos[decenas], false); // Mostrar digito 1
+    delay(5); // delay
+    digitalWrite(digito1, LOW); // Apagar digito 1
 
     // Mostrar unidade
     digitalWrite(digito2, HIGH); // Encender el display 2
-    mostrarDigito(segmentos[unidades], true); // Mostrar el dígito de la decena con punto decimal
-    delay(5); // Corto delay para mantener sincronía
-    digitalWrite(digito2, LOW); // Apagar el display 2
+    mostrarDigito(segmentos[unidades], true); // Mostrar digito 1
+    delay(5); // delay
+    digitalWrite(digito2, LOW); // apagar digito 2
 
 
     // Mostrar decimales
     digitalWrite(digito3, HIGH); // Encender el display 3
-    mostrarDigito(segmentos[decimales], false); // Mostrar el dígito de la unidad
-    delay(5); // Corto delay para mantener sincronía
-    digitalWrite(digito3, LOW); // Apagar el display 3
+    mostrarDigito(segmentos[decimales], false); // Mostrar digito 3
+    delay(5); // delay
+    digitalWrite(digito3, LOW); // apagar digito 3
 }
+
+
 void setup() {
 
   // Configurar PWM
@@ -95,7 +102,7 @@ void setup() {
   // pin del servo
   mi_servo.attach(32);
 
-  // Configurar del boton
+  // Configurar boton
   pinMode(button_pin, INPUT_PULLUP);
 
   // Segmentos
@@ -113,34 +120,33 @@ void setup() {
   pinMode(digito2, OUTPUT);
   pinMode(digito3, OUTPUT);
 
-  // Configurar la comunicación serial
+  // Puerto serial
   Serial.begin(115200);
 
-  while(! Serial);
+  //while(! Serial);
 
-  Serial.print("Connecting to Adafruit IO");
+  //Serial.print("Connecting to Adafruit IO");
 
-  io.connect();
+  //io.connect();
 
-  while(io.status() < AIO_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
+  //while(io.status() < AIO_CONNECTED) {
+    //Serial.print(".");
+    //delay(500);
+  //}
 
 
    //we are connected
-  Serial.println();
-  Serial.println(io.statusText());
+  //Serial.println();
+  //Serial.println(io.statusText());
 }
-
 
 void loop() {
   
   if (digitalRead(button_pin) == LOW) {
     float lectura_analogica = analogRead(lm35_pin);
     float voltaje = lectura_analogica * (3.3 / 4095.0);
-    float temperatura = voltaje * 100.0 + 17; 
-    io.run();
+    float temperatura = voltaje * 100.0 + 23; 
+    //io.run();
     Serial.print("Lectura ADC: ");
     Serial.print(lectura_analogica);
     Serial.print(" | Voltaje: ");
@@ -153,34 +159,34 @@ void loop() {
 
     // LEDs y Servo
     if (temperatura > 37.5) {
-      ledcWrite(pwm_channel_rojo, 255);  // LED rojo encendido al máximo brillo
+      ledcWrite(pwm_channel_rojo, 255);  // LED rojo encendido
       ledcWrite(pwm_channel_amarillo, 0); // LED amarillo apagado
       ledcWrite(pwm_channel_verde, 0);    // LED verde apagado
-      mi_servo.write(0);    
-      verde ->save(0); 
-      rojo ->save(1);
-      amarillo ->save(0);           // Posición del servo en 180 grados
+      mi_servo.write(0);    // Rotar 0 grados
+      //verde ->save(0); 
+      //rojo ->save(1);
+      //amarillo ->save(0);            
     } else if (temperatura > 37.0 && temperatura <= 37.5) {
       ledcWrite(pwm_channel_rojo, 0);     // LED rojo apagado
-      ledcWrite(pwm_channel_amarillo, 255); // LED amarillo encendido al máximo brillo
+      ledcWrite(pwm_channel_amarillo, 255); // LED amarillo encendido 
       ledcWrite(pwm_channel_verde, 0);    // LED verde apagado
-      mi_servo.write(90); 
-      verde ->save(0); 
-      rojo ->save(0);
-      amarillo ->save(1);                    // Posición del servo en 90 grados
+      mi_servo.write(90); // rotar 90 grados
+      //verde ->save(0); 
+      //rojo ->save(0);
+      //amarillo ->save(1);                    
     } else if(temperatura < 37) {
       ledcWrite(pwm_channel_rojo, 0);     // LED rojo apagado
       ledcWrite(pwm_channel_amarillo, 0); // LED amarillo apagado
-      ledcWrite(pwm_channel_verde, 255);  // LED verde encendido al máximo brillo
-      mi_servo.write(180);  
-      verde ->save(1); 
-      rojo ->save(0);
-      amarillo ->save(0);                     // Posición del servo en 0 grados
+      ledcWrite(pwm_channel_verde, 255);  // LED verde encendido 
+      mi_servo.write(180);  // rotar 180 grados
+      //verde ->save(1); 
+      //rojo ->save(0);
+      //amarillo ->save(0);                     
     }
     mostrarNumero(temperatura);
-    temperCanal ->save(temperatura);
+    //temperCanal ->save(temperatura);
     delay(5); 
 
   }
-  delay(5); 
+  //delay(5); 
 }
