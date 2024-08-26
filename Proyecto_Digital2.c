@@ -41,3 +41,42 @@ byte segmentos[] = {
     0b01111111, // 8
     0b01101111  // 9
 };
+
+// Función para mostrar un dígito en el display
+void mostrarDigito(byte valor, bool punto) {
+    // Asignar cada segmento
+    digitalWrite(segA, valor & 0b00000001);
+    digitalWrite(segB, valor & 0b00000010);
+    digitalWrite(segC, valor & 0b00000100);
+    digitalWrite(segD, valor & 0b00001000);
+    digitalWrite(segE, valor & 0b00010000);
+    digitalWrite(segF, valor & 0b00100000);
+    digitalWrite(segG, valor & 0b01000000);
+    digitalWrite(dp, punto ? HIGH : LOW);  // Encender o apagar el punto decimal
+}
+
+
+void mostrarNumero(int numero) {
+    int decimales = (numero * 10) % 10;
+    int decenas = (numero / 10);
+    int unidades = numero % 10;
+
+  // Mostrar decenas
+    digitalWrite(digito1, HIGH); // Encender el display 1
+    mostrarDigito(segmentos[decenas], false); // Mostrar el dígito de la decena con punto decimal
+    delay(5); // Corto delay para mantener sincronía
+    digitalWrite(digito1, LOW); // Apagar el display 2
+
+    // Mostrar unidade
+    digitalWrite(digito2, HIGH); // Encender el display 2
+    mostrarDigito(segmentos[unidades], true); // Mostrar el dígito de la decena con punto decimal
+    delay(5); // Corto delay para mantener sincronía
+    digitalWrite(digito2, LOW); // Apagar el display 2
+
+
+    // Mostrar decimales
+    digitalWrite(digito3, HIGH); // Encender el display 3
+    mostrarDigito(segmentos[decimales], false); // Mostrar el dígito de la unidad
+    delay(5); // Corto delay para mantener sincronía
+    digitalWrite(digito3, LOW); // Apagar el display 3
+}
